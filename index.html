@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%
+        }
+
+        #body-wrapper {
+            min-height: 100%;
+            background: url(https://ht.wanmei.com/resources/jpg/221229/11031672300798847.jpg) no-repeat;
+            background-size: cover;
+        }
+
+        .footer {
+            color: white;
+            text-align: center;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+    </style>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="apple-touch-icon" sizes="57x57" href="icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="icons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="icons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <title>《幻塔》boss计时器</title>
+</head>
+<body>
+<div id="body-wrapper">
+    <div class="container">
+        <div style="height: 50px;"></div>
+        <div class="card row clearfix">
+            <div class="text-center card-header">
+                《幻塔》boss计时器
+            </div>
+            <div class="card-body col-md-12 column">
+                <form id="kanGongCaculater">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"> <strong>未确认击杀boss线：</strong></label>
+                        <div id="huanta_line" class="col-sm-10">
+
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8 alert alert-success">
+                            <strong>使用说明：</strong><br> 1.初次使用时，点击未确认击杀boss线的<strong style="color:blue">寄</strong>按钮进行确认，则开始倒计时。
+                            <br>2.再次击杀boss时，点击<strong style="color:blue">寄</strong>按钮重新计时，无法确认boss刷新时间或错误点选时可使用<strong
+                                style="color:red">润</strong>按钮取消。
+                            <br>3.暂不支持离线存储，使用计时过程中请勿刷新界面。
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"> <strong>待击杀boss线：</strong></label>
+                        <div id="huanta_line_ready_kill" class="col-sm-10">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>线</th>
+                                    <th>剩余刷新时间</th>
+                                    <th>击杀</th>
+                                    <th>偷猎</th>
+                                </tr>
+                                </thead>
+                                <tbody id="huanta_line_wait_table">
+
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+
+                </form>
+
+
+            </div>
+        </div>
+        <div class="footer">
+            <span>本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span><br><span>本站访客数 <span
+                id="busuanzi_value_site_uv"></span> 人次</span>
+            <div class="copyright"> ©2021 - 2022 By 星岛二·樱花庄·冰卡诺</div>
+        </div>
+    </div>
+
+</div>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- bootstrap.bundle.min.js 用于弹窗、提示、下拉菜单，包含了 popper.min.js -->
+<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    var timeCount = []
+
+    function msTimeCount() {
+        this._hour = 0;   //“小时”数
+        this._minute = 0;   //“分”数
+        this._seconds = 0;  //“秒”数
+        //
+        this._hourHtmlObj = {};//“小时”html对象
+        this._minuteHtmlObj = {};//“分”html对象
+        this._secondsHtmlObj = {};//“秒”html对象
+        //
+        this._totalSeconds = 0;//总秒数
+    };
+    msTimeCount.prototype = {
+        //1.获取对象
+        $: function (ID) {
+            return document.getElementById(ID);
+        },
+        //2.初始化：
+        /*
+         * arrTime:  传入时间数组，格式为[1,30,30]，代表 1小时30分30秒;
+         * arrHtmlObj: 更新时间数据的Html对象数组，格式为["hour","minute","seconds"];
+        */
+        init: function (arrTime, arrHtmlObj) {
+            var _this = this;
+            _this._hour = parseInt(arrTime[0]);
+            _this._minute = parseInt(arrTime[1]);
+            _this._seconds = parseInt(arrTime[2]);
+            _this._hourHtmlObj = _this.$(arrHtmlObj[0]);
+            _this._minuteHtmlObj = _this.$(arrHtmlObj[1]);
+            _this._secondsHtmlObj = _this.$(arrHtmlObj[2]);
+            _this._totalSeconds = parseInt(_this._hour * 60 * 60 + _this._minute * 60 + _this._seconds);
+            //开始计时：
+            _this.timeCount();
+        },
+        //3.计时器：
+        timeCount: function () {
+            var _this = this;
+            var tmpTimeCount = setInterval(
+                function () {
+                    _this._totalSeconds--;
+                    //alert(_this._totalSeconds);
+                    _this.refreshTime();
+                    if (_this._totalSeconds < 1) {
+                        clearInterval(tmpTimeCount);
+                        return;
+                    }
+                }
+                , 1000);
+        },
+        //4.刷新页面时间:
+        refreshTime: function () {
+            var _this = this;
+            if (_this._totalSeconds > 0) {
+                _this._hour = parseInt(_this._totalSeconds / 3600);
+                _this._minute = parseInt((_this._totalSeconds - _this._hour * 3600) / 60);
+                _this._seconds = _this._totalSeconds - _this._hour * 3600 - _this._minute * 60;
+            } else {
+                _this._hour = _this._minute = _this._seconds = 0;
+            }
+            _this._hourHtmlObj.innerHTML = _this._hour;
+            _this._minuteHtmlObj.innerHTML = _this._minute;
+            _this._secondsHtmlObj.innerHTML = _this._seconds;
+        }
+    }
+
+
+    let huanta_line = document.getElementById("huanta_line")
+    var add_html_line = document.createElement("div")
+    for (var i = 0; i < 60; i++) {
+
+        add_html_line.innerHTML = add_html_line.innerHTML + "<label class=\"col-sm-1 col-form-label\" for=\"\"> " +
+            "\t<button  onclick=\"huanta_line_kill(" + String(i + 1) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_" + String(i + 1) + "\">寄</button>" +
+            String(i + 1) + "线</label>\n"
+    }
+    huanta_line.appendChild(add_html_line)
+    //正数加天数，负数减天数
+    Date.prototype.addDay = function (num) {
+        return new Date(Date.parse(this) + (86400000 * num));
+    }
+    var myDate = new Date();
+
+    function huanta_line_kill(x) {
+        this_count = x
+        if ($("#huanta_line_" + x).attr('class') === "btn btn-primary") {
+            console.log("huanta_line_" + x)
+            $("#huanta_line_" + x).attr('class', "btn btn-default disabled")
+            let huanta_line_wait_table = document.getElementById("huanta_line_wait_table")
+            var add_html_line_tr = document.createElement("tr")
+            add_html_line_tr.setAttribute("id", "huanta_line_wait_tr_" + x)
+            add_html_line_tr.innerHTML = add_html_line_tr.innerHTML + "  <td>" + x + "线</td>\n" +
+                "          <td><span id='hour" + x + "'>1</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
+                "\t <td><button  onclick=\"huanta_line_kill_again(" + String(x) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_killed_" + String(x) + "\">寄</button></td>" +
+                "\t <td><button  onclick=\"huanta_line_run(" + String(x) + ")\" type=\"button\" class=\"btn btn-danger\" id=\"huanta_line_run_" + String(x) + "\">润</button></td>"
+            huanta_line_wait_table.appendChild(add_html_line_tr)
+            timeCount[x] = new msTimeCount();
+            timeCount[x].init([0, 60, 0], ["hour" + x, "minute" + x, "seconds" + x]);
+        } else {
+            console.log("已禁用！")
+        }
+    }
+
+    function huanta_line_kill_again(x) {
+        $("#huanta_line_wait_tr_" + x).remove();
+        console.log("huanta_line_" + x)
+        $("#huanta_line_" + x).attr('class', "btn btn-default disabled")
+        let huanta_line_wait_table = document.getElementById("huanta_line_wait_table")
+        var add_html_line_tr = document.createElement("tr")
+        add_html_line_tr.setAttribute("id", "huanta_line_wait_tr_" + x)
+        add_html_line_tr.innerHTML = add_html_line_tr.innerHTML + "  <td>" + x + "线</td>\n" +
+            "          <td><span id='hour" + x + "'>1</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
+            "\t <td><button  onclick=\"huanta_line_kill_again(" + String(x) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_killed_" + String(i + 1) + "\">寄</button></td>" +
+            "\t <td><button  onclick=\"huanta_line_run(" + String(x) + ")\" type=\"button\" class=\"btn btn-danger\" id=\"huanta_line_run_" + String(x) + "\">润</button></td>"
+        huanta_line_wait_table.appendChild(add_html_line_tr)
+        timeCount[x] = new msTimeCount();
+        timeCount[x].init([0, 60, 0], ["hour" + x, "minute" + x, "seconds" + x]);
+    }
+
+    function huanta_line_run(x) {
+        timeCount[x] = new msTimeCount();
+        timeCount[x].init([0, 0, 0], ["hour" + x, "minute" + x, "seconds" + x]);
+        $("#huanta_line_wait_tr_" + x).remove();
+        $("#huanta_line_" + x).attr('class', "btn btn-primary")
+
+    }
+</script>
+</body>
+
+</html>
