@@ -205,12 +205,12 @@
             var add_html_line_tr = document.createElement("tr")
             add_html_line_tr.setAttribute("id", "huanta_line_wait_tr_" + x)
             add_html_line_tr.innerHTML = add_html_line_tr.innerHTML + "  <td>" + x + "线</td>\n" +
-                "          <td><span id='hour" + x + "'>0</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
+                "          <td><span id='hour" + x + "'>1</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
                 "\t <td><button  onclick=\"huanta_line_kill_again(" + String(x) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_killed_" + String(x) + "\">寄</button></td>" +
                 "\t <td><button  onclick=\"huanta_line_run(" + String(x) + ")\" type=\"button\" class=\"btn btn-danger\" id=\"huanta_line_run_" + String(x) + "\">润</button></td>"
             huanta_line_wait_table.appendChild(add_html_line_tr)
             timeCount[x] = new msTimeCount();
-            timeCount[x].init([0, 60, 0], ["hour" + x, "minute" + x, "seconds" + x]);
+            timeCount[x].init([1, 0, 0], ["hour" + x, "minute" + x, "seconds" + x]);
         } else {
             console.log("已禁用！")
         }
@@ -224,12 +224,12 @@
         var add_html_line_tr = document.createElement("tr")
         add_html_line_tr.setAttribute("id", "huanta_line_wait_tr_" + x)
         add_html_line_tr.innerHTML = add_html_line_tr.innerHTML + "  <td>" + x + "线</td>\n" +
-            "          <td><span id='hour" + x + "'>0</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
+            "          <td><span id='hour" + x + "'>1</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
             "\t <td><button  onclick=\"huanta_line_kill_again(" + String(x) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_killed_" + String(i + 1) + "\">寄</button></td>" +
             "\t <td><button  onclick=\"huanta_line_run(" + String(x) + ")\" type=\"button\" class=\"btn btn-danger\" id=\"huanta_line_run_" + String(x) + "\">润</button></td>"
         huanta_line_wait_table.appendChild(add_html_line_tr)
         timeCount[x] = new msTimeCount();
-        timeCount[x].init([0, 60, 0], ["hour" + x, "minute" + x, "seconds" + x]);
+        timeCount[x].init([1, 0, 0], ["hour" + x, "minute" + x, "seconds" + x]);
     }
 
     function huanta_line_run(x) {
