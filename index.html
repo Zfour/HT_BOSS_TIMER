@@ -45,6 +45,24 @@
 </head>
 <body>
 <div id="body-wrapper">
+<!-- 按钮触发模态框 -->
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+            </div>
+            <div class="modal-body">
+                <input type="file" id="input_file">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
     <div class="container">
         <div style="height: 50px;"></div>
         <div class="card row clearfix">
@@ -53,6 +71,20 @@
             </div>
             <div class="card-body col-md-12 column">
                 <form id="kanGongCaculater">
+                     <div class="form-group row">
+                          <label class="col-sm-2 col-form-label"> <strong>导入\导出JSON：</strong></label>
+                         <input id="htboss_name" class="col-sm-3" type="text" class="form-control" placeholder="导出时请输入boss名称">
+                         <div class="col-sm-2"><button data-toggle="modal" data-target="#myModal" type="button" class="btn btn-primary" id="input">导入</button>
+
+                         <button onclick="output_list_data()" type="button" class="btn btn-secondary" id="output">导出</button></div>
+
+                         </div>
+                      <div class="form-group row">
+                     <div class="col-sm-2"></div>
+                          <div class="col-sm-8 alert alert-success">
+                            <strong>使用说明：</strong><br> 1.导出时请输入boss名称。（为后面多boss扩展）
+                            <br>2.当导入数据较旧时，时间不准的线会标上“*”。</div>
+                        </div>
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label"> <strong>未确认击杀boss线：</strong></label>
                         <div id="huanta_line" class="col-sm-10">
@@ -71,7 +103,7 @@
                     <div class="form-group row">
                         <label class="col-sm-2 col-form-label"> <strong>待击杀boss线：</strong></label>
                         <div id="huanta_line_ready_kill" class="col-sm-10">
-                            <table class="table">
+                            <table id="htt_table" class="table">
                                 <thead>
                                 <tr>
                                     <th>线</th>
@@ -114,8 +146,113 @@
 <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
 <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
-    var timeCount = []
+    window.onload = function() {
+  let input = document.getElementById("input_file");//得到上传按钮的对象
+  //console.log(info);                         //测试用
+  input.onchange = function() {
+      $('#myModal').modal('hide')
 
+      //给按钮的onchange写一个读取函数
+    const file = this.files[0];                //其实是可以扩展到多文件上传的，不过我们就选第一个，也就是下标0
+    if (!!file) {                              //!!是一个js的语法，表示后面的变量不是null/undefined/空串，实用写法。
+      const reader = new FileReader();         //实例化一个FileReader对象
+      reader.readAsText(file, "gbk");          //借助 FileReader 的方法，按照文本格式读入文件，第二个参数是编码方式（可空）
+      reader.onload = function() {
+        tmp1 = this.result;
+        console.log(JSON.parse(tmp1))//然后在FileReader的onload方法里，然后在FileReader的onload方法里，刚刚读入的文件能以文本的形式得到了
+          for (var val of JSON.parse(tmp1)['list']) {
+              var now = Date.parse(new Date())
+              timeDifference=val['lastKnownKillTs']+3600000-now
+              console.log(timeDifference)
+              if (timeDifference>0){
+var hour_ms = 60 * 60 * 1000; //一小时等于的毫秒数
+var min_ms = 60 * 1000;
+var ss_ms = 1000;
+var h_ms = parseInt(timeDifference / hour_ms); //获取小时部分
+var m_ms = parseInt(timeDifference % hour_ms / min_ms); //获取分钟部分
+var s_ms = parseInt(timeDifference % min_ms / 1000); //获取秒数
+z=''
+                  huanta_line_kil_input(val['line'],h_ms,m_ms,s_ms,z)
+              }else{
+                  while ( timeDifference<0){ timeDifference=timeDifference+3600000}
+                  var hour_ms = 60 * 60 * 1000; //一小时等于的毫秒数
+var min_ms = 60 * 1000;
+var ss_ms = 1000;
+var h_ms = parseInt(timeDifference / hour_ms); //获取小时部分
+var m_ms = parseInt(timeDifference % hour_ms / min_ms); //获取分钟部分
+var s_ms = parseInt(timeDifference % min_ms / 1000); //获取秒数
+                  z='*'
+                 huanta_line_kil_input(val['line'],h_ms,m_ms,s_ms,z)
+              }
+    console.log(val)
+
+}
+
+        //注意这个对象还是文本，不能拿来直接用，但首先你可以把它带出来。
+        //(不推荐也不反对用全局变量)
+      };
+    }
+  };
+
+};
+
+
+
+    var timeCount = []
+    var tmp1=''
+    function input_list_data(){
+
+    }
+
+    function output_list_data(){
+     if( $("#htboss_name").val()!==''){
+      var history_list={list:[]}
+$('#huanta_line_wait_table tr').each(function(i){
+
+    // 遍历 tr
+    str_title="\\u"+$("#htboss_name").val().charCodeAt(0).toString(16)
+    item={'line':'','name':str_title,'lastKnownKillTs':'','spawnMinutes':'60'}
+      $(this).children('td').each(function(j){  // 遍历 tr 的各个 td
+
+        if (j===0){
+             item['line']=$(this).text().replace('线','')
+        }
+        if(j===1){
+            time_list=$(this).text().replace("时",":").replace("分",":").replace("秒","").split(':')
+            time_past= 3600000-time_list[0]*3600000-time_list[1]*60000-time_list[2]*1000
+            var now = Date.parse(new Date())
+            item['lastKnownKillTs']=now - time_past
+
+        }
+      });
+      history_list["list"].push(item)
+    });
+console.log(JSON.stringify(history_list))
+           const stringData =JSON.stringify(history_list)
+                            // dada 表示要转换的字符串数据，type 表示要转换的数据格式
+                            const blob = new Blob([stringData], {
+                                type: 'application/json'
+                            })
+                            // 根据 blob生成 url链接
+                            const objectURL = URL.createObjectURL(blob)
+
+                            // 创建一个 a 标签Tag
+                            const aTag = document.createElement('a')
+                            // 设置文件的下载地址
+                            aTag.href = objectURL
+                            // 设置保存后的文件名称
+         let time_download=new Date()
+                            aTag.download =time_download.toLocaleString()+ ".json";
+// 给 a 标签添加点击事件
+                            aTag.click()
+                            // 释放一个之前已经存在的、通过调用 URL.createObjectURL() 创建的 URL 对象。
+                            // 当你结束使用某个 URL 对象之后，应该通过调用这个方法来让浏览器知道不用在内存中继续保留对这个文件的引用了。
+                            URL.revokeObjectURL(objectURL)
+   }else {
+         alert('请填写boss名称！')
+     }
+
+ }
     function msTimeCount() {
         this._hour = 0;   //“小时”数
         this._minute = 0;   //“分”数
@@ -195,6 +332,27 @@
         return new Date(Date.parse(this) + (86400000 * num));
     }
     var myDate = new Date();
+
+    function huanta_line_kil_input(x,h,m,s,z) {
+        this_count = x
+        if ($("#huanta_line_" + x).attr('class') === "btn btn-primary") {
+            console.log("huanta_line_" + x)
+            $("#huanta_line_" + x).attr('class', "btn btn-default disabled")
+            let huanta_line_wait_table = document.getElementById("huanta_line_wait_table")
+            var add_html_line_tr = document.createElement("tr")
+            add_html_line_tr.setAttribute("id", "huanta_line_wait_tr_" + x)
+            add_html_line_tr.innerHTML = add_html_line_tr.innerHTML + "  <td>" +z+ x + "线</td>\n"  +
+                "          <td><span id='hour" + x + "'>1</span>时<span id='minute" + x + "'>0</span>分<span id='seconds" + x + "'>0</span>秒</td>\n" +
+                "\t <td><button  onclick=\"huanta_line_kill_again(" + String(x) + ")\" type=\"button\" class=\"btn btn-primary\" id=\"huanta_line_killed_" + String(x) + "\">寄</button></td>" +
+                "\t <td><button  onclick=\"huanta_line_run(" + String(x) + ")\" type=\"button\" class=\"btn btn-danger\" id=\"huanta_line_run_" + String(x) + "\">润</button></td>"
+            huanta_line_wait_table.appendChild(add_html_line_tr)
+            timeCount[x] = new msTimeCount();
+            timeCount[x].init([h, m, s], ["hour" + x, "minute" + x, "seconds" + x]);
+        } else {
+            console.log("已禁用！")
+        }
+    }
+
 
     function huanta_line_kill(x) {
         this_count = x
