@@ -211,11 +211,11 @@ $('#huanta_line_wait_table tr').each(function(i){
 
     // 遍历 tr
     str_title=$("#htboss_name").val()
-    item={'line':'','name':str_title,'lastKnownKillTs':0,'spawnMinutes':'60'}
+    item={'line':0,'name':str_title,'lastKnownKillTs':0,'spawnMinutes':60}
       $(this).children('td').each(function(j){  // 遍历 tr 的各个 td
 
         if (j===0){
-             item['line']=$(this).text().replace('线','')
+             item['line']= parseInt($(this).text().replace('线',''))
         }
         if(j===1){
             time_list=$(this).text().replace("时",":").replace("分",":").replace("秒","").split(':')
