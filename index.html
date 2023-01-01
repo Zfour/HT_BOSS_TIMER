@@ -210,8 +210,8 @@ var s_ms = parseInt(timeDifference % min_ms / 1000); //获取秒数
 $('#huanta_line_wait_table tr').each(function(i){
 
     // 遍历 tr
-    str_title="\\u"+$("#htboss_name").val().charCodeAt(0).toString(16)
-    item={'line':'','name':str_title,'lastKnownKillTs':'','spawnMinutes':'60'}
+    str_title=$("#htboss_name").val()
+    item={'line':'','name':str_title,'lastKnownKillTs':0,'spawnMinutes':'60'}
       $(this).children('td').each(function(j){  // 遍历 tr 的各个 td
 
         if (j===0){
